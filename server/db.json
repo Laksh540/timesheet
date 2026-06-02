@@ -1,0 +1,24 @@
+{
+  "timesheets": [
+    {
+      "id": 1,
+      "week": "1 - 5 January, 2024",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 2,
+      "week": "8 - 12 January, 2024",
+      "status": "INCOMPLETE"
+    }
+  ],
+
+  "weekDetails": [
+    {
+      "id": 1,
+      "timesheetId": 1,
+      "date": "2024-01-01",
+      "task": "Dashboard UI",
+      "hours": 8
+    }
+  ]
+}
