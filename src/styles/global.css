@@ -1,0 +1,12 @@
+/* Contains:
+
+Tailwind imports
+CSS resets
+reusable utility classes
+scrollbar styling */
+
+@import "tailwindcss";
+
+body {
+  font-family: 'Inter', sans-serif;
+}
