@@ -7,8 +7,8 @@ export interface Timesheet {
 }
 
 export interface WeekDetail {
-  id?: number;
-  timesheetId: string;
+  id?: string;
+  timesheetId?: string;
   date: string;
   task: string;
   hours: number;

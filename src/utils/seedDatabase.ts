@@ -39,7 +39,7 @@ export const seedDatabase = async () => {
     if (i === 0) {
       for (let day = 0; day < 5; day++) {
         await createWeekDetail({
-          timesheetId: createdTimesheet?.id,
+          timesheetId: createdTimesheet.id,
           date: format(addDays(weekStart, day), "yyyy-MM-dd"),
           task: `Task ${day + 1}`,
           hours: 8,
