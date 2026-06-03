@@ -23,13 +23,14 @@ export const getWeekDetails = async (): Promise<WeekDetail[]> => {
 };
 
 export const createTimesheet = async (data: Timesheet) => {
-  await fetch(`${API_BASE_URL}/timesheets`, {
+  const response = await fetch(`${API_BASE_URL}/timesheets`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
+  return response.json();
 };
 
 export const createWeekDetail = async (data: WeekDetail) => {

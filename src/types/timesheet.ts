@@ -1,5 +1,5 @@
 export interface Timesheet {
-  id: number;
+  id?: string;
   weekLabel: string;
   weekStart: string;
   weekEnd: string;
@@ -8,7 +8,7 @@ export interface Timesheet {
 
 export interface WeekDetail {
   id?: number;
-  timesheetId: number;
+  timesheetId: string;
   date: string;
   task: string;
   hours: number;

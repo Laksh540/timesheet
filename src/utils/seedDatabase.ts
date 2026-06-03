@@ -23,7 +23,7 @@ export const seedDatabase = async () => {
     const weekEnd = addDays(weekStart, 4);
 
     const timesheet: Timesheet = {
-      id: i + 1,
+      // id: `timesheet-${i + 1}`,
       weekLabel: `${format(weekStart, "d MMM")} - ${format(
         weekEnd,
         "d MMM yyyy",
@@ -33,13 +33,13 @@ export const seedDatabase = async () => {
       status: i === 0 ? "COMPLETED" : i === 1 ? "INCOMPLETE" : "MISSING",
     };
 
-    await createTimesheet(timesheet);
+    const createdTimesheet: Timesheet = await createTimesheet(timesheet);
 
     // Latest week → COMPLETED (40 hours)
     if (i === 0) {
       for (let day = 0; day < 5; day++) {
         await createWeekDetail({
-          timesheetId: timesheet.id,
+          timesheetId: createdTimesheet?.id,
           date: format(addDays(weekStart, day), "yyyy-MM-dd"),
           task: `Task ${day + 1}`,
           hours: 8,
@@ -50,7 +50,7 @@ export const seedDatabase = async () => {
     // Second week → INCOMPLETE (10 hours)
     if (i === 1) {
       await createWeekDetail({
-        timesheetId: timesheet.id,
+        timesheetId: createdTimesheet?.id,
         date: format(weekStart, "yyyy-MM-dd"),
         task: "Partial Work",
         hours: 10,

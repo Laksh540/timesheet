@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Timesheet } from "../types/timesheet";
 import { getTimesheets } from "../api/timesheet";
 import { useNavigate } from "react-router-dom";
+import { TimesheetStatus } from "../constants";
 
 const getStatusStyles = (status: string) => {
   switch (status) {
@@ -71,16 +72,23 @@ const DashboardPage = () => {
   const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [status, setStatus] = useState("");
 
   const navigate = useNavigate();
 
-  const itemsPerPage = 5;
+  // const itemsPerPage = 5;
 
   const totalPages = Math.ceil(timesheets.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-
-  const paginatedTimesheets = timesheets.slice(
+  const filteredTimesheet = timesheets.filter((t) => {
+    if (status === "") return true;
+    if (t.status === status) {
+      return true;
+    }
+  });
+  const paginatedTimesheets = filteredTimesheet.slice(
     startIndex,
     startIndex + itemsPerPage,
   );
@@ -103,91 +111,125 @@ const DashboardPage = () => {
   }, []);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white">
-      {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <p className="text-sm text-gray-500">Loading timesheets...</p>
-        </div>
-      ) : (
-        <>
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b border-gray-200 text-left">
-                  <th className="px-6 py-4 text-sm font-medium text-gray-500">
-                    Week #
-                  </th>
+    <div className="rounded-2xl bg-white p-6 shadow-sm">
+      <h1 className="text-3xl font-semibold text-gray-900">Your Timesheets</h1>
 
-                  <th className="px-6 py-4 text-sm font-medium text-gray-500">
-                    Date
-                  </th>
+      <div className="my-6 flex gap-4">
+        <select className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none">
+          <option>Date Range</option>
+        </select>
 
-                  <th className="px-6 py-4 text-sm font-medium text-gray-500">
-                    Status
-                  </th>
+        <select
+          className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none"
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value={""}>All Status</option>
+          <option value={TimesheetStatus.COMPLETED}>Completed</option>
+          <option value={TimesheetStatus.INCOMPLETE}>Incompleted</option>
+          <option value={TimesheetStatus.MISSING}>Missing</option>
+        </select>
+      </div>
 
-                  <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
-                    Action
-                  </th>
-                </tr>
-              </thead>
+      <div className="rounded-2xl border border-gray-200 bg-white">
+        {loading ? (
+          <div className="flex h-64 items-center justify-center">
+            <p className="text-sm text-gray-500">Loading timesheets...</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left">
+                    <th className="px-6 py-4 text-sm font-medium text-gray-500">
+                      Week #
+                    </th>
 
-              <tbody>
-                {paginatedTimesheets.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-16 text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <p className="text-sm font-medium text-gray-700">
-                          No timesheets found
-                        </p>
+                    <th className="px-6 py-4 text-sm font-medium text-gray-500">
+                      Date
+                    </th>
 
-                        <p className="text-sm text-gray-500">
-                          Try changing the applied filters.
-                        </p>
-                      </div>
-                    </td>
+                    <th className="px-6 py-4 text-sm font-medium text-gray-500">
+                      Status
+                    </th>
+
+                    <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                      Action
+                    </th>
                   </tr>
-                ) : (
-                  paginatedTimesheets.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="border-t border-gray-200 hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-5 text-sm text-gray-700">
-                        {item.id}
-                      </td>
+                </thead>
 
-                      <td className="px-6 py-5 text-sm text-gray-600">
-                        {item.weekLabel}
-                      </td>
+                <tbody>
+                  {paginatedTimesheets.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-16 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <p className="text-sm font-medium text-gray-700">
+                            No timesheets found
+                          </p>
 
-                      <td className="px-6 py-5">
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusStyles(
-                            item.status,
-                          )}`}
-                        >
-                          {item.status}
-                        </span>
-                      </td>
-
-                      <td className="px-6 py-5 text-right">
-                        <button
-                          onClick={() => navigate(`/timesheet/${item.id}`)}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                        >
-                          {getActionLabel(item.status)}
-                        </button>
+                          <p className="text-sm text-gray-500">
+                            Try changing the applied filters.
+                          </p>
+                        </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    paginatedTimesheets.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        className="border-t border-gray-200 hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-5 text-sm text-gray-700">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
 
+                        <td className="px-6 py-5 text-sm text-gray-600">
+                          {item.weekLabel}
+                        </td>
+
+                        <td className="px-6 py-5">
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusStyles(
+                              item.status,
+                            )}`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-5 text-right">
+                          <button
+                            onClick={() => navigate(`/timesheet/${item.id}`)}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                          >
+                            {getActionLabel(item.status)}
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="mt-6 flex items-center justify-between">
+        <select
+          onChange={(e) => {
+            setItemsPerPage(Number(e.target.value));
+            setCurrentPage(1);
+          }}
+          className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none"
+        >
+          <option value={5}>5 per page</option>
+          <option value={10}>10 per page</option>
+        </select>
+        <div className="flex items-center overflow-hidden rounded-lg border border-gray-300">
           {paginatedTimesheets.length > 0 && (
-            <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+            <div className="flex items-center justify-between border-t border-gray-200 ">
               <button
                 className="border-r px-4 py-2 text-sm text-gray-600 disabled:opacity-50"
                 disabled={currentPage === 1}
@@ -221,8 +263,8 @@ const DashboardPage = () => {
               </button>
             </div>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

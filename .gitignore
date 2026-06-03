@@ -13,8 +13,8 @@ dist-ssr
 *.local
 
 
-server/db.json
-server/db.seeded.json
+# server/db.json
+# server/db.seeded.json
 
 
 # Editor directories and files
