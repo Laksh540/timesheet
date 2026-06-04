@@ -39,23 +39,23 @@ Run frontend:
 npm run dev
 ```
 
-Run mock backend:
-
-```
-npm run server
-```
-
 Frontend runs on:
 
 ```
 http://localhost:5173
 ```
 
-Backend runs on:
+Install backend dependencies:
+open another terminal window in vs code then
+cd server
+npm install
+
+Run mock backend:
 
 ```
-http://localhost:3000
+npm run mock-server
 ```
+
 
 ## Environment Variable
 
