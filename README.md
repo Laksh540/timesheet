@@ -49,6 +49,7 @@ Install backend dependencies:
 open another terminal window in vs code then
 cd server
 npm install
+cd ..
 
 Run mock backend:
 
