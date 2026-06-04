@@ -3,6 +3,8 @@ import type { Timesheet } from "../types/timesheet";
 import { getTimesheets } from "../api/timesheet";
 import { useNavigate } from "react-router-dom";
 import { TimesheetStatus } from "../constants";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const getStatusStyles = (status: string) => {
   switch (status) {
@@ -36,58 +38,45 @@ const getActionLabel = (status: string) => {
   }
 };
 
-// const timesheets = [
-//   {
-//     id: 1,
-//     week: "1 - 5 January, 2024",
-//     status: "COMPLETED",
-//     action: "View",
-//   },
-//   {
-//     id: 2,
-//     week: "8 - 12 January, 2024",
-//     status: "COMPLETED",
-//     action: "View",
-//   },
-//   {
-//     id: 3,
-//     week: "15 - 19 January, 2024",
-//     status: "INCOMPLETE",
-//     action: "Update",
-//   },
-//   {
-//     id: 4,
-//     week: "22 - 26 January, 2024",
-//     status: "COMPLETED",
-//     action: "View",
-//   },
-//   {
-//     id: 5,
-//     week: "28 January - 1 February, 2024",
-//     status: "MISSING",
-//     action: "Create",
-//   },
-// ];
 const DashboardPage = () => {
   const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [status, setStatus] = useState("");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+
+  const [startDate, endDate] = dateRange;
 
   const navigate = useNavigate();
 
   // const itemsPerPage = 5;
 
-  const totalPages = Math.ceil(timesheets.length / itemsPerPage);
-
   const startIndex = (currentPage - 1) * itemsPerPage;
   const filteredTimesheet = timesheets.filter((t) => {
-    if (status === "") return true;
-    if (t.status === status) {
-      return true;
+    // status filter
+    const matchesStatus = status === "" || t.status === status;
+
+    // date range filter
+    let matchesDateRange = true;
+
+    if (startDate && endDate) {
+      // replace these fields with your actual week start/end fields
+      const weekStart = new Date(t.weekStart);
+      const weekEnd = new Date(t.weekEnd);
+
+      // overlap logic
+      matchesDateRange = weekStart <= endDate && weekEnd >= startDate;
     }
+
+    return matchesStatus && matchesDateRange;
   });
+
+  const totalPages = Math.ceil(filteredTimesheet.length / itemsPerPage);
+
   const paginatedTimesheets = filteredTimesheet.slice(
     startIndex,
     startIndex + itemsPerPage,
@@ -110,22 +99,47 @@ const DashboardPage = () => {
     fetchTimesheets();
   }, []);
 
+  //   useEffect(() => {
+  //   setCurrentPage(1);
+  // }, [status, dateRange]);
+
+  const handleDateRangeChange = (update: [Date | null, Date | null]) => {
+    setDateRange(update);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatus(e.target.value);
+    setCurrentPage(1);
+  };
+
+  console.log("date range", dateRange);
   return (
     <div className="rounded-2xl bg-white p-6 shadow-sm">
       <h1 className="text-3xl font-semibold text-gray-900">Your Timesheets</h1>
 
       <div className="my-6 flex gap-4">
-        <select className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none">
+        {/* <select className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none">
           <option>Date Range</option>
-        </select>
+        </select> */}
+        <DatePicker
+          selectsRange
+          startDate={startDate}
+          endDate={endDate}
+          onChange={handleDateRangeChange}
+          isClearable
+          placeholderText="Select date range"
+          className="w-55 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none"
+          calendarClassName="rounded-xl border shadow-lg"
+        />
 
         <select
           className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none"
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={handleStatusChange}
         >
           <option value={""}>All Status</option>
           <option value={TimesheetStatus.COMPLETED}>Completed</option>
-          <option value={TimesheetStatus.INCOMPLETE}>Incompleted</option>
+          <option value={TimesheetStatus.INCOMPLETE}>Incomplete</option>
           <option value={TimesheetStatus.MISSING}>Missing</option>
         </select>
       </div>

@@ -9,7 +9,9 @@ export interface Timesheet {
 export interface WeekDetail {
   id?: string;
   timesheetId?: string;
-  date: string;
+  date?: string;
   task: string;
   hours: number;
+  projectId: string;
+  workTypeId: string;
 }

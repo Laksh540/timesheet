@@ -5,6 +5,21 @@ import {
   getTimesheets,
 } from "../api/timesheet";
 import type { Timesheet } from "../types/timesheet";
+import { PROJECT_OPTIONS, WORK_TYPE_OPTIONS } from "../constants";
+
+const getRandomItem = <T>(array: T[]): T => {
+  return array[Math.floor(Math.random() * array.length)];
+};
+
+// const TASKS = [
+//   "Homepage Development",
+//   "Bug Fixing",
+//   "API Integration",
+//   "Dashboard UI",
+//   "Authentication Setup",
+//   "Responsive Design",
+//   "Testing Components",
+// ];
 
 export const seedDatabase = async () => {
   const existingTimesheets = await getTimesheets();
@@ -43,6 +58,8 @@ export const seedDatabase = async () => {
           date: format(addDays(weekStart, day), "yyyy-MM-dd"),
           task: `Task ${day + 1}`,
           hours: 8,
+          projectId: getRandomItem(PROJECT_OPTIONS).id,
+          workTypeId: getRandomItem(WORK_TYPE_OPTIONS).id,
         });
       }
     }
@@ -54,6 +71,8 @@ export const seedDatabase = async () => {
         date: format(weekStart, "yyyy-MM-dd"),
         task: "Partial Work",
         hours: 10,
+        projectId: getRandomItem(PROJECT_OPTIONS).id,
+        workTypeId: getRandomItem(WORK_TYPE_OPTIONS).id,
       });
     }
   }
